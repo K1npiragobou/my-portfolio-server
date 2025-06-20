@@ -1,14 +1,29 @@
 [
   {
-    "id": 1,
-    "name": "Street Fighter 6",
-    "rank": "Diamond 5",
-    "point": "-500 RR"
+    "id": "streetfighter6",
+    "name": "StreetFighter6",
+    "rank": "ダイヤモンド",
+    "point": 20500,
+    "history": [
+      { "date": "2024-06-01", "point": 20000 },
+      { "date": "2024-06-02", "point": 20100 },
+      { "date": "2024-06-03", "point": 20200 },
+      { "date": "2024-06-04", "point": 20300 },
+      { "date": "2024-06-05", "point": 20400 },
+      { "date": "2024-06-06", "point": 20500 }
+    ]
   },
   {
-    "id": 2,
-    "name": "Pokemon Pocket",
-    "rank": "Super Ball",
-    "point": "+5 RP"
+    "id": "pokepoke",
+    "name": "ポケモンポケット",
+    "rank": "スーパーボール級",
+    "point": 1800,
+    "history": [
+      { "date": "2024-06-01", "point": 1700 },
+      { "date": "2024-06-02", "point": 1720 },
+      { "date": "2024-06-03", "point": 1750 },
+      { "date": "2024-06-04", "point": 1780 },
+      { "date": "2024-06-05", "point": 1800 }
+    ]
   }
 ]
