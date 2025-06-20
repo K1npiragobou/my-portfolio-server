@@ -5,7 +5,7 @@ const https = require('https');
 const BEARER_TOKEN = process.env.TWITTER_BEARER_TOKEN;
 const USERNAME = process.env.TWITTER_USERNAME;
 
-// キャッシュ用変数
+// キャッシュ（1時間有効）
 let cache = {
   data: null,
   timestamp: 0
@@ -13,7 +13,6 @@ let cache = {
 const CACHE_DURATION = 60 * 60 * 1000; // 1時間（ミリ秒）
 
 router.get('/', async (req, res) => {
-  // キャッシュが有効ならそれを返す
   if (cache.data && Date.now() - cache.timestamp < CACHE_DURATION) {
     return res.json(cache.data);
   }
@@ -22,17 +21,11 @@ router.get('/', async (req, res) => {
     return res.status(500).json({ error: 'Twitter API設定がありません' });
   }
 
-  // ユーザーID取得
   const userId = await getUserId(USERNAME);
-  if (!userId) {
-    return res.status(404).json({ error: 'ユーザーが見つかりません' });
-  }
+  if (!userId) return res.status(404).json({ error: 'ユーザーが見つかりません' });
 
-  // ツイート取得
-  const tweets = await getLatestTweets(userId);
-  if (!tweets) {
-    return res.status(500).json({ error: 'ツイート取得に失敗しました' });
-  }
+  const tweets = await getTweetsWithUser(userId);
+  if (!tweets) return res.status(500).json({ error: 'ツイート取得失敗' });
 
   // キャッシュに保存
   cache = {
@@ -51,10 +44,10 @@ function getUserId(username) {
       path: `/2/users/by/username/${username}`,
       headers: { Authorization: `Bearer ${BEARER_TOKEN}` }
     };
-    https.get(options, (resp) => {
+    https.get(options, res => {
       let data = '';
-      resp.on('data', chunk => data += chunk);
-      resp.on('end', () => {
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
         try {
           const json = JSON.parse(data);
           resolve(json.data?.id || null);
@@ -66,21 +59,36 @@ function getUserId(username) {
   });
 }
 
-// 最新ツイート取得
-function getLatestTweets(userId) {
+// ツイート取得 + ユーザー情報も含める
+function getTweetsWithUser(userId) {
   return new Promise((resolve) => {
+    const path = `/2/users/${userId}/tweets?max_results=5&tweet.fields=created_at&expansions=author_id&user.fields=name,username,profile_image_url`;
     const options = {
       hostname: 'api.twitter.com',
-      path: `/2/users/${userId}/tweets?max_results=5&tweet.fields=created_at,text`,
+      path,
       headers: { Authorization: `Bearer ${BEARER_TOKEN}` }
     };
-    https.get(options, (resp) => {
+
+    https.get(options, res => {
       let data = '';
-      resp.on('data', chunk => data += chunk);
-      resp.on('end', () => {
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
         try {
           const json = JSON.parse(data);
-          resolve(json.data || []);
+          const user = json.includes?.users?.[0];
+          if (!user) return resolve(null);
+
+          const tweets = (json.data || []).map(tweet => ({
+            text: tweet.text,
+            created_at: tweet.created_at,
+            user: {
+              name: user.name,
+              username: user.username,
+              profile_image_url: user.profile_image_url
+            }
+          }));
+
+          resolve(tweets);
         } catch {
           resolve(null);
         }
