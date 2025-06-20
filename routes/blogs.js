@@ -74,5 +74,20 @@ router.delete('/:id', async (req, res) => {
   await writeBlogs(blogs);
   res.json(deleted[0]);
 });
+// スプレッドシート等から全データを一括セット
+router.post('/set-all', async (req, res) => {
+  const blogs = req.body;
+  if (!Array.isArray(blogs)) {
+    return res.status(400).json({ error: 'Array of blogs is required' });
+  }
+  for (const blog of blogs) {
+    if (!blog.title || !blog.date || !blog.content) {
+      return res.status(400).json({ error: 'Each blog must have title, date, content' });
+    }
+  }
+  // idを自動付与したい場合はここで付与も可能
+  await writeBlogs(blogs);
+  res.json({ message: 'Blogs data replaced', count: blogs.length });
+});
 
 module.exports = router;

@@ -71,5 +71,18 @@ router.delete('/:id', async (req, res) => {
   await writeDramas(dramas);
   res.json(deleted[0]);
 });
-
+// 一括上書きエンドポイント
+router.post('/set-all', async (req, res) => {
+  const dramas = req.body;
+  if (!Array.isArray(dramas)) {
+    return res.status(400).json({ error: 'Array of dramas is required' });
+  }
+  for (const drama of dramas) {
+    if (!drama.id || !drama.title || typeof drama.progress !== 'number' || typeof drama.total !== 'number') {
+      return res.status(400).json({ error: 'Each drama must have id, title, progress(number), total(number)' });
+    }
+  }
+  await writeDramas(dramas);
+  res.json({ message: 'Dramas data replaced', count: dramas.length });
+});
 module.exports = router;
