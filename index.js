@@ -25,11 +25,14 @@ app.use((req, res, next) => {
 const blogRoutes = require('./routes/blogs');
 const gameRoutes = require('./routes/games');
 const dramaRoutes = require('./routes/dramas');
+const tweetsRouter = require('./routes/tweets');
+
 
 // ルーティング
 app.use('/api/blogs', blogRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/dramas', dramaRoutes);
+app.use('/tweets', tweetsRouter);
 // ルートが見つからない場合のエラーハンドリング
 app.use((req, res) => {
   res.status(404).json({ error: 'Not Found' });
