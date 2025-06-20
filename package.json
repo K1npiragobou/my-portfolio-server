@@ -1,0 +1,28 @@
+{
+  "name": "my-portfolio-server",
+  "version": "1.0.0",
+  "description": "API backend for portfolio site",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://K1npiragobou@github.com/K1npiragobou/my-portfolio-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/K1npiragobou/my-portfolio-server/issues"
+  },
+  "homepage": "https://github.com/K1npiragobou/my-portfolio-server#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
